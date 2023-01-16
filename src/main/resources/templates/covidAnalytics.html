@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Covid Analytics</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+</head>
+
+<body>
+
+<div class="container">
+    <ul class="nav nav-tabs">
+        <li><a href="india">Home</a></li>
+        <li class="active"><a href="analytics">Analytics</a></li>
+    </ul>
+    <h1> Corona Spread Analytics Dashboard </h1>
+
+    <div id="piechart" style="width: 800px; height: 500px;"></div>
+
+    <div id="columnchart_material" style="width: 800px; height: 500px;"></div>
+
+    <p>Source: disease.sh</p>
+    <p>Inference: Abhishek Anand</p>
+
+</div>
+</body>
+
+    <!--pie-chart begins-->
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var activePercent = Number("[[${activePercent}]]");
+        var recoveredPercent = Number("[[${recoveredPercent}]]");
+        var deathsPercent = Number("[[${deathsPercent}]]");
+
+        var data = google.visualization.arrayToDataTable([
+          [ {label: 'Case', id: 'case'},
+            {label: 'Count', id: 'count', type: 'number'} ],
+          ['Active Cases',activePercent],
+          ['Recovered So Far',recoveredPercent],
+          ['Death Toll',deathsPercent]
+        ]);
+
+        var options = {
+          title: 'Covid cases breakdown',
+          subtitle: 'Still active, recovered, deaths',
+          is3D:true,
+          colors: ['#b30ee0', '#36e00e', '#e00e0e']
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+        chart.draw(data, options);
+      }
+    </script>
+    <!--pie-chart ends-->
+
+    <!--bar-chart (total recovery) starts-->
+    <script type="text/javascript" th:inline="javascript">
+      google.charts.load('current', {'packages':['bar']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var sortedStatesList = [[${sortedStatesList}]];
+        var state1 = sortedStatesList[0];
+        var state2 = sortedStatesList[1];
+        var state3 = sortedStatesList[2];
+        var state4 = sortedStatesList[3];
+        var state5 = sortedStatesList[4];
+
+        var data = google.visualization.arrayToDataTable([
+          [{label: 'State', id: 'state'},
+            {label: 'Total Recovery Rate', id: 'totalRecoveryRate', type: 'number'} ],
+          [state1.state,state1.recoveryRate],
+          [state2.state,state2.recoveryRate],
+          [state3.state,state3.recoveryRate],
+          [state4.state,state4.recoveryRate],
+          [state5.state,state5.recoveryRate]
+        ]);
+
+        var options = {
+          chart: {
+            title: 'Worst Affected States',
+            subtitle: 'States with least recovery rate'
+          }
+        };
+
+        var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
+
+        chart.draw(data, google.charts.Bar.convertOptions(options));
+      }
+    </script>
+    <!--bar-chart (total recovery) ends-->
+
+</html>
